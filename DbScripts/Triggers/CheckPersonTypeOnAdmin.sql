@@ -1,0 +1,16 @@
+CREATE TRIGGER TRG_CheckPersonTypeOnAdminInsert
+on ADMINS
+AFTER INSERT
+AS 
+BEGIN
+	IF EXISTS(
+	SELECT 1 
+	FROM PERSONS
+	JOIN inserted i ON PERSONS.person_id = i.FK_admin_person_id
+	WHERE PERSONS.person_type != 'Admin'
+	)
+	BEGIN
+		RAISERROR ('ONLY PERSONS WITH person_type OF "Admin" CAN BE INSERTED INTO THE ADMINS TABLE.', 16,1)
+		ROLLBACK TRANSACTION
+	END
+END
